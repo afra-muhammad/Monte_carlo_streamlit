@@ -7,10 +7,9 @@ from monte_carlo import run_monte_carlo, Flow_rate, Heat_Energy
 
 st.title("Monte Carlo Simulation of Shower CO2 Emissions")
 
-# --- Constants ---
-MAX_BINS = 30  # fixed number of bins for all histograms
+MAX_BINS = 30
 
-# --- User inputs ---
+# User inputs
 N = st.number_input(
     "Number of simulations (min=100, max=20000)",
     min_value=100,
@@ -55,11 +54,11 @@ else:
     mu = st.number_input("Lognormal μ (min=0, max=15)", min_value=0.0, max_value=5.0, value=2.2, step=0.01)
     sigma = st.number_input("Lognormal σ (min=0.01, max=5)", min_value=0.01, max_value=2.0, value=0.28, step=0.01)
 
-# --- Placeholders ---
+# Placeholders
 progress_bar = st.empty()
 status_text = st.empty()
 
-# --- Run simulation ---
+# Run simulation
 st.write(f"Running Monte Carlo simulation with {N} iterations...")
 
 def progress_callback(progress):
@@ -79,10 +78,10 @@ df_sim = run_monte_carlo(
 progress_bar.empty()
 status_text.text("Simulation done!")
 
-# --- Histogram plotting function ---
+# Histogram plotting function
 def plot_histogram_with_stats(df, column, title, color):
     st.subheader(title)
-    max_val = df[column].max() * 1.05  # X-axis padding
+    max_val = df[column].max() * 1.05
 
     col_stats, col_pct, col_count = st.columns([2, 7, 7])
 
@@ -121,10 +120,30 @@ def plot_histogram_with_stats(df, column, title, color):
         )
         st.altair_chart(hist_count, use_container_width=True)
 
-# --- Total CO2 ---
+# Total CO2
 plot_histogram_with_stats(df_sim, 'CO2_Total', 'Total CO2 Emissions (kg)', '#1f77b4')
 
-# --- Water CO2 filter ---
+# Total CO2 : boxplot
+
+st.subheader("Boxplot: Total CO₂ Emissions")
+
+st.subheader("Boxplot: Total CO₂ Emissions")
+
+box = (
+    alt.Chart(df_sim)
+    .mark_boxplot(size=40)
+    .encode(
+        x=alt.X('CO2_Total:Q', title="Total CO₂ Emissions (kg)"),
+        tooltip=[
+            alt.Tooltip('CO2_Total:Q', title="Total CO₂ (kg)", format=".3f")
+        ]
+    )
+    .properties(height=100)
+)
+
+st.altair_chart(box, use_container_width=True)
+
+# Water CO2 filter
 st.subheader("Filter CO2 from Water by Source")
 water_sources = df_sim['Water_Source'].unique().tolist()
 
@@ -142,7 +161,6 @@ with col1:
 with col2:
     st.button("Deselect All Water Sources", on_click=deselect_all_water)
 
-# Bind multiselect directly to session_state key
 selected_water_sources = st.multiselect(
     "Select Water Source(s)",
     options=water_sources,
@@ -155,7 +173,7 @@ if df_water_filtered.empty:
 else:
     plot_histogram_with_stats(df_water_filtered, 'CO2_Water', 'CO2 from Water (kg)', '#ff7f0e')
 
-# --- Heat CO2 filter ---
+# Heat CO2 filter
 st.subheader("Filter CO2 from Heat by Source")
 heat_sources = df_sim['Heat_Source'].unique().tolist()
 
@@ -185,9 +203,9 @@ if df_heat_filtered.empty:
 else:
     plot_histogram_with_stats(df_heat_filtered, 'CO2_Heat', 'CO2 from Heat (kg)', '#2ca02c')
 
-# --- Shower Duration ---
+# Shower Duration
 plot_histogram_with_stats(df_sim, 'Shower_time_min', 'Shower Duration (minutes)', '#d62728')
 
-# --- Full simulation table ---
+# Simulation table
 st.subheader("Full Simulation Data (up to 1000 rows)")
 st.dataframe(df_sim.head(1000))
