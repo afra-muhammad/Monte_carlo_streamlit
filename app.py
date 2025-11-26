@@ -7,6 +7,8 @@ from monte_carlo import run_monte_carlo, Flow_rate, Heat_Energy
 
 st.title("Monte Carlo Simulation of Shower CO2 Emissions")
 
+st.warning("🔧 Please enable *Wide mode* in Settings (top-right menu) for best display!")
+
 MAX_BINS = 30
 
 # User inputs
