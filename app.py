@@ -126,9 +126,6 @@ def plot_histogram_with_stats(df, column, title, color):
 plot_histogram_with_stats(df_sim, 'CO2_Total', 'Total CO2 Emissions (kg)', '#1f77b4')
 
 # Total CO2 : boxplot
-
-st.subheader("Boxplot: Total CO₂ Emissions")
-
 st.subheader("Boxplot: Total CO₂ Emissions")
 
 box = (
